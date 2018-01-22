@@ -61,11 +61,13 @@ GPIO.output(houseLight, GPIO.LOW)
 def leverIn():
     GPIO.output(leverLeftMove, GPIO.HIGH)
     GPIO.output(leverRightMove, GPIO.HIGH)
+    #GPIO.output(houseLight, GPIO.HIGH)
     pass
 
 def leverOut():
     GPIO.output(leverLeftMove, GPIO.LOW)
-    GPIO.output(leverLeftMove, GPIO.HIGH)
+    GPIO.output(leverRightMove, GPIO.LOW)
+    #GPIO.output(houseLight, GPIO.LOW)
     pass
 
 def bye():
@@ -148,7 +150,9 @@ try:
                     leverIn()
                     react = 0
                     GPIO.output(feeder, GPIO.LOW) # 固定1粒
+                    GPIO.output(buzzer, GPIO.LOW)
                     sleep(0.1)
+                    GPIO.output(feeder, GPIO.HIGH)
                     GPIO.output(feeder, GPIO.HIGH)
                     listPosition = listPosition + 1
                     time1 = time.time()
@@ -156,8 +160,6 @@ try:
                     timeLatency = round(time1 - timeTrial, 2)
                     trial = trial + 1
                     leverLeftTrial = leverLeftTrial + 1
-                    sleep(0.1)
-                    GPIO.output(feeder, GPIO.HIGH)
                     print("固定報酬", leverLeftTrial)
                     print("timePast ", timePast)
                     print("timeLatency ", timeLatency, '\n')
@@ -168,6 +170,7 @@ try:
                     pass
                     sleep(iti)
                     leverOut()
+                    timeTrial = time.time()
                 while GPIO.input(leverLeftAct) == GPIO.HIGH:
                     sleep(0.01)
 
@@ -185,8 +188,6 @@ try:
                     timeLatency = round(time1 - timeTrial, 2)
                     trial = trial + 1
                     leverRightTrial = leverRightTrial + 1
-                    sleep(0.1)
-                    GPIO.output(feeder, GPIO.HIGH)
                     print("変動報酬", leverRightTrial)
                     print("timePast ", timePast)
                     print("timeLatency ", timeLatency, '\n')
@@ -204,23 +205,29 @@ try:
                     print("無報酬",'\n','\n')
                     sleep(iti)
                     leverOut()
+                    timeTrial = time.time()
                     pass
                 else:
                     for i in range(2):
                         GPIO.output(feeder, GPIO.LOW)
+                        GPIO.output(buzzer, GPIO.LOW)
                         sleep(0.5)
                         GPIO.output(feeder, GPIO.HIGH)
+                        GPIO.output(buzzer, GPIO.HIGH)
                         sleep(0.5)
                     print("大報酬",'\n','\n')
                     reinforce = 0
                     reinforcers = 0
                     sleep(iti)
                     leverOut()
+                    timeTrial = time.time()
                     pass
                     
             if leverLeftTrial + leverRightTrial >= trialMax:
                 print("最大試行数に達して終了")
                 print(timePast, "秒かかった")
+                print("左レバー　", leverLeftTrial, "　回")
+                print("右レバー　", leverRightTrial, "　回")
                 bye()
 
             sleep(0.1)
