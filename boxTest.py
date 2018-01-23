@@ -31,6 +31,7 @@ import time
 
 # ポート設定
 GPIO.setmode(GPIO.BCM)
+GPIO.setup(buzzer, GPIO.OUT)
 GPIO.setup(feeder, GPIO.OUT)
 GPIO.setup(leverLeftMove, GPIO.OUT)
 GPIO.setup(leverRightMove, GPIO.OUT)
@@ -46,7 +47,7 @@ GPIO.output(leverRightMove, GPIO.HIGH)
 
 # 関数設定
 def begin(equipmentName):
-    print("\n", equipmentName, "番ポートテスト開始")
+    print("\n", equipmentName, "ポートテスト開始")
     pass
 
 
@@ -55,7 +56,7 @@ def confirm(equipmentName):
     answer = input("Press y:\n")
     while True:
         if answer == "y":
-            print("\n", "=====", str(equipmentName), "番ポート異常なし", "=====", "\n")
+            print("\n", "=====", str(equipmentName), "ポート異常なし", "=====", "\n")
             break
     pass
 
@@ -102,6 +103,11 @@ while True:
 begin("House Light")
 test(houseLight)
 confirm("House Light")
+
+# buzzer
+begin("Buzzer")
+test(buzzer)
+confitm("Buzzer")
 
 # leverLeftMove
 begin("Left Lever in-out")
