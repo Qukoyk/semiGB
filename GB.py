@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 '''
-GBNew.py
+GB.py
 
 GB課題プログラム
 '''
@@ -10,7 +10,7 @@ __author__ = "Qukoyk"
 __contacts__ = "m172236@hiroshima-u.ac.jp"
 
 x = 2 # FR x
-iti = 3
+iti = 30
 timeMax = 70 * 60 #最大何分間
 trialMax = 100 # 最大試行数
 
@@ -49,10 +49,6 @@ GPIO.setup(houseLight, GPIO.OUT)
 GPIO.setup(leverLeftAct, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.setup(leverRightAct, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
-GPIO.output(leverLeftMove, GPIO.HIGH)
-GPIO.output(leverRightMove, GPIO.HIGH)
-GPIO.output(feeder, GPIO.HIGH)
-
 
 # データ保存先を指定
 leverPressData = [] # レバーが押されたら記録をする（全反応）
@@ -71,11 +67,6 @@ listPosition = 0
 leverPressCounter = 0
 
 
-GPIO.output(leverLeftMove, GPIO.LOW)
-GPIO.output(leverRightMove, GPIO.LOW)
-GPIO.output(houseLight, GPIO.LOW)
-GPIO.output(buzzer, GPIO.HIGH)
-
 def leverIn():
     GPIO.output(leverLeftMove, GPIO.HIGH)
     GPIO.output(leverRightMove, GPIO.HIGH)
@@ -88,12 +79,17 @@ def leverOut():
     #GPIO.output(houseLight, GPIO.LOW)
     pass
 
+def protect():
+    while GPIO.input(leverLeftAct) == GPIO.HIGH or GPIO.input(leverRightAct) == GPIO.HIGH:
+        sleep(0.01)
+    pass
+
 def chickenDinner():
-    for i in range(8):
+    for i in range(9):
         GPIO.output(buzzer, GPIO.LOW)
-        sleep(0.1)
+        sleep(0.15)
         GPIO.output(buzzer, GPIO.HIGH)
-        sleep(0.1)
+        sleep(0.15)
     pass
 
 def reinforce(rewardKind): # sReward/mReward/lReward
@@ -102,7 +98,7 @@ def reinforce(rewardKind): # sReward/mReward/lReward
         GPIO.output(buzzer, GPIO.LOW)
         sleep(0.5)
         GPIO.output(feeder, GPIO.HIGH)
-        GPIO.output(feeder, GPIO.HIGH)
+        GPIO.output(buzzer, GPIO.HIGH)
         sleep(0.5)
     pass
 
@@ -156,7 +152,7 @@ while True:
 
 # 初期化数据
 
-#os.chdir('/home/pi/Desktop/kyoku/gbData')
+os.chdir('/home/pi/Desktop/kyoku/gbData')
 
 leftRight = 0
 
@@ -183,14 +179,24 @@ with open(answer2 + '.csv', 'a+') as myfile:
     writer = csv.writer(myfile)
     writer.writerow(headers)
 
-
+# ポート初期化
+GPIO.output(buzzer, GPIO.HIGH)
+GPIO.output(feeder, GPIO.HIGH)
+GPIO.output(leverLeftMove, GPIO.LOW)
+GPIO.output(leverRightMove, GPIO.LOW)
+GPIO.output(houseLight, GPIO.LOW)
 
 # メインプログラム
 try:
     while timeNow - timeStart < timeMax:
-        # timeNow = time.time()
+        timeNow = time.time()
 
         # レバー押しを測る
+        if reactLeft == x or reactRight == x:
+            react = x
+            reactLeft = 0
+            reactRight = 0
+            pass
         if GPIO.input(leverLeftAct) == GPIO.HIGH:
             # 回数の累進
             leverPressCounter = leverPressCounter + 1
@@ -210,6 +216,7 @@ try:
             print("第", leverPressCounter, "回", timePast)
             print("timeLatency", timeLatency, '\n')
             print("左レバー ", reactLeft, "/", x, '\n')
+            protect()
             pass
         elif GPIO.input(leverRightAct) == GPIO.HIGH:
             # 回数の累進
@@ -230,13 +237,7 @@ try:
             print("第", leverPressCounter, "回", timePast)
             print("timeLatency", timeLatency, '\n')
             print("右レバー ", reactRight, "/", x, '\n')
-            pass
-        while GPIO.input(leverLeftAct) == GPIO.HIGH or GPIO.input(leverRightAct) == GPIO.HIGH:
-            sleep(0.01)
-        if reactLeft == x or reactRight == x:
-            react = x
-            reactLeft = 0
-            reactRight = 0
+            protect()
             pass
             
 
