@@ -190,7 +190,7 @@ GPIO.output(houseLight, GPIO.LOW)
 # メインプログラム
 try:
     while timeNow - timeStart < timeMax:
-        timeNow = time.time()
+        # timeNow = time.time()
 
         # レバー押しを測る
         if reactLeft == x or reactRight == x:
@@ -265,6 +265,7 @@ try:
                 # レバー引き込みとITI
                 sleep(iti)
                 leverOut()
+                protect()
                 timeTrial = time.time()
 
 
@@ -299,6 +300,7 @@ try:
                 reinforceYN = 0
                 sleep(iti)
                 leverOut()
+                protect()
                 timeTrial = time.time()
                 pass
             else:
@@ -309,6 +311,7 @@ try:
                 reinforcers = 0
                 sleep(iti)
                 leverOut()
+                protect()
                 timeTrial = time.time()
                 
         # 最大試行数になったか否か
