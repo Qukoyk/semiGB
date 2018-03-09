@@ -56,6 +56,7 @@ leverActData = [] # 目標行動とその種類を表記（例えばFI10に10s�
 leverData = [] # 押されたレバーは左か右かを記録
 latencyData = [] # 潜時リストを記録
 timeData = [] # 反応時間を記録
+randomData = []
 
 dataTransfer = [] # 行列変換用リスト
 
@@ -87,27 +88,33 @@ def protect():
 def reinforce(rewardKind): # sReward/mReward/lReward
     for i in range(rewardKind):
         GPIO.output(feeder, GPIO.LOW)
-        GPIO.output(buzzer, GPIO.LOW)
+        GPIO.output(buzzer, GPIO.HIGH)
         sleep(0.5)
         GPIO.output(feeder, GPIO.HIGH)
-        GPIO.output(buzzer, GPIO.HIGH)
+        GPIO.output(buzzer, GPIO.LOW)
         sleep(0.5)
     pass
 
 def chickenDinner():
     for i in range(9):
-        GPIO.output(buzzer, GPIO.LOW)
-        sleep(0.15)
         GPIO.output(buzzer, GPIO.HIGH)
+        sleep(0.15)
+        GPIO.output(buzzer, GPIO.LOW)
         sleep(0.15)
     pass
 
 def dataSaving():
-    dataTransfer = [leverPressData, leverData, timeData, leverActData, latencyData]
+    # データを保存
+    dataTransfer = [leverPressData, leverData, timeData, leverActData, latencyData, randomData]
     dataTransfer = list(zip(*dataTransfer))
     with open(answer2 + '.csv', 'a+') as myfile:
         writer = csv.writer(myfile)
         writer.writerows(dataTransfer)
+    # 生成された乱数列を保存
+    randomList = list(zip(*myList))
+    with open(answer2 + '_randomList.csv', 'a+') as myfile2:
+        writer = csv.writer(myfile2)
+        writer.writerow(randomList)
     pass
 
 def bye():
@@ -120,6 +127,7 @@ def bye():
 for i in range(1000):
     leverActData.append('')
     latencyData.append('')
+    randomData.append('')
     pass
 
 # 乱数生成
@@ -174,18 +182,18 @@ timeLatency = 0
 timeTrial = time.time()
 #day = time.strftime("%Y-%m-%d")
 
-headers = ['Trial', 'LeverSide', 'Time', 'SideCounter', 'Latency']
+headers = ['Counter', 'LeverSide', 'Time', 'Trial', 'Latency', 'Big/Small']
 with open(answer2 + '.csv', 'a+') as myfile:
     writer = csv.writer(myfile)
     writer.writerow(headers)
 
 
 # ポート初期化
-GPIO.output(buzzer, GPIO.HIGH)
+GPIO.output(buzzer, GPIO.LOW)
 GPIO.output(feeder, GPIO.HIGH)
 GPIO.output(leverLeftMove, GPIO.LOW)
 GPIO.output(leverRightMove, GPIO.LOW)
-GPIO.output(houseLight, GPIO.LOW)
+GPIO.output(houseLight, GPIO.HIGH)
 
 # メインプログラム
 try:
@@ -243,7 +251,7 @@ try:
             
 
         # FRを達成したら：
-        if ((trial < 2 or trial >= 4) and leftRight == 'left'): # 固定報酬選択肢
+        if leftRight == 'left': # 固定報酬選択肢
             if react == x:
                 leverIn()
                 react = 0
@@ -269,8 +277,8 @@ try:
                 timeTrial = time.time()
 
 
-        elif (leftRight == 'right' and trial >= 2): #変動報酬選択肢
-            if (react == x):
+        elif leftRight == 'right': #変動報酬選択肢
+            if react == x:
                 leverIn()
                 react = 0
                 # 強化
@@ -285,6 +293,7 @@ try:
                 trial = trial + 1
                 leverRightTrial = leverRightTrial + 1
                 leverActData.insert(leverPressCounter - 1, leverRightTrial)
+                randomData.insert(leverPressCounter - 1, reinforcers)
                 # モニターに表せ
                 print("変動報酬", leverRightTrial)
                 print("timePast ", timePast)
