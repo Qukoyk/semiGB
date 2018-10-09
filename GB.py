@@ -111,10 +111,10 @@ def dataSaving():
         writer = csv.writer(myfile)
         writer.writerows(dataTransfer)
     # 生成された乱数列を保存
-    randomList = list(zip(*myList))
+    # myList = list(zip(*myList))
     with open(answer2 + '_randomList.csv', 'a+') as myfile2:
         writer = csv.writer(myfile2)
-        writer.writerow(randomList)
+        writer.writerow(myList)
     pass
 
 def bye():
@@ -160,7 +160,7 @@ while True:
 
 # 初期化数据
 
-os.chdir('/home/pi/Desktop/kyoku/gbData')
+os.chdir('/home/pi/デスクトップ/kyoku/gbData')
 
 leftRight = 0
 
