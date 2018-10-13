@@ -346,10 +346,10 @@ try:
             listPosition = listPosition + 1
             # 試行を累進
             trial = trial + 1
-            leverLeftTrial = leverLeftTrial + 1
-            leverActData.insert(leverPressCounter - 1, leverLeftTrial)
+            leverRightTrial = leverRightTrial + 1
+            leverActData.insert(leverPressCounter - 1, leverRightTrial)
             # モニターに表せ
-            print("固定報酬", leverLeftTrial)
+            print("固定報酬", leverRightTrial)
             print("反応時間", timePast)
             print("反応潜時", timeLatency)
             print('\n'+'===================='+'\n')
@@ -371,11 +371,11 @@ try:
             listPosition = listPosition + 1
             # 試行を累進する
             trial = trial + 1
-            leverRightTrial = leverRightTrial + 1
-            leverActData.insert(leverPressCounter - 1, leverRightTrial)
+            leverLeftTrial = leverLeftTrial + 1
+            leverActData.insert(leverPressCounter - 1, leverLeftTrial)
             randomData.insert(leverPressCounter - 1, reinforcers)
             # モニターに表せ
-            print("変動報酬", leverRightTrial)
+            print("変動報酬", leverLeftTrial)
             print("反応時間", timePast)
             print("反応潜時", timeLatency)
             print('\n'+'===================='+'\n')
