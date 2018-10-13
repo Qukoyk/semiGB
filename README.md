@@ -19,5 +19,5 @@ But even in the lose trials of variable choice in semi-gambling, minimum reward 
 * "IO_test" folder
   Scripts to do IO tests before experiments.
 
-contacts: m172236#hiroshima-u.ac.jp (change # to @)
+contacts: m172236#hiroshima-u.ac.jp (change # to @)    
           Ruoheng QU
