@@ -12,8 +12,9 @@ __author__ = "Qukoyk"
 __contacts__ = "m172236@hiroshima-u.ac.jp"
 
 
-# ファイル名
-fileName = '1-GB-33'
+# パスとファイル名
+path = 'F:/実験2018/kyoku/GB-semiGB/Exp1/' # 絶対パス
+fileName = '1-GB-33'　# ファイル名
 
 
 # 初期設定
@@ -34,7 +35,7 @@ for i in range(300):
     pass
 
 
-with open('F:/実験2018/kyoku/GB-semiGB/Exp1/' + fileName + '.csv') as file:
+with open(path + fileName + '.csv') as file:
     reader = csv.DictReader(file)
     for row in reader:
         # 小報酬試行なら累積
