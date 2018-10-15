@@ -17,3 +17,5 @@ and low-reward / high-reward following with risky-lever.
   Lever-Pressing Training before the real experiment.
 * autoShaingL10R10.py
   also lever-pressing training. To ensure rat will press each side lever..
+* ruiseki.py
+  a script to analyse shift rates after continuous small rewards.
