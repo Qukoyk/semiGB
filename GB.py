@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 
 '''
-semiGB.py
+GB.py
 
-semiGB課題プログラム
+GB課題プログラム
 '''
 
 __author__ = "Qukoyk"
