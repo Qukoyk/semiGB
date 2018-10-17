@@ -109,7 +109,6 @@ myList = []
 listPosition = 0
 leverPressCounter = 0
 
-
 # ファイルの保存先（ディレクトリ）
 os.chdir('/home/pi/デスクトップ/kyoku/gbData/')
 
@@ -133,6 +132,9 @@ timePast = 0
 timeLatency = 0
 timeTrial = time.time()
 #day = time.strftime("%Y-%m-%d")
+
+randPosition = 0
+randCounter = 0
 
 # 実験開始プロセス
 answer2 = input("今回の番号は？:\n")
@@ -158,27 +160,31 @@ for i in range(1000):
     randomData.append('')
     pass
 
-# 乱数生成
-print("乱数生成中……")
-
-for i in range(0,50): # 0（小報酬）を50回生成、数列になる
-    myList.append(0)
-    pass
-for i in range(50,100):
-    myList.insert(random.randint(0,i),1) # そして0の数列にランダムで挿入
-    i = i + 1
-    pass
-    
-print(myList)
-print('\n'+'===================='+'\n')
-
-
 
 '''
 関数部分
 
 いろんな関数を事前宣言するところ
 '''
+# 乱数生成
+def ransu(): # 大報酬を連続3回以上しないよう
+    # Ruru's magic lists.
+    a = [1,1,0,0]
+    b = [0,0,1,1]
+    c = [1,0,1,0]
+    d = [0,1,0,1]
+    e = [1,0,0,1]
+    f = [0,1,1,0]
+    values = [a,b,c,d,e,f]
+    for i in range(25):
+        x = random.choice(values)
+        for number in range(len(x)):
+            myList.append(x[number])
+            number = number + 1
+        i = i + 1
+        pass
+    pass
+
 # レバー格納関数
 def leverIn():
     GPIO.output(leverLeftMove, GPIO.HIGH)
@@ -267,7 +273,24 @@ def bye():
     sys.exit() # プログラム停止
     pass
 
-
+# 乱数生成・大報酬が3連以上存在しないか否かを検証
+print("乱数生成中")
+ransu()
+while True:
+    if myList[randPosition] == 1 and myList[randPosition+1] == 1 and randPosition < 99:
+        randCounter = randCounter + 1
+    if myList[randPosition] == 0:
+        randCounter = 0
+    randPosition = randPosition + 1
+    if randCounter >= 3:
+        print("大報酬3連以上あり　やり直し中")
+        myList = []
+        ransu()
+        randPosition = 0
+        randCounter = 0
+    if randPosition >= 99:
+        break
+print("生成されました", '\n', myList)
 
 # 点灯！！
 GPIO.output(houseLight, GPIO.HIGH)
