@@ -115,5 +115,3 @@ print('\n' + fileName, "に：")
 for i in range(max(renzokuListAll2)):
     matome(i + 1)
     pass
-
-
