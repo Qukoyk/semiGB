@@ -12,7 +12,7 @@ __contacts__ = "m172236@hiroshima-u.ac.jp"
 x = 2 # FR x
 iti = 30
 timeMax = 70 * 60 #最大何分間
-trialMax = 100 # 最大試行数
+trialsMax = 100 # 最大試行数
 
 sReward = 1 # 変動小報酬の粒数
 mReward = 2 # 固定中報酬の粒数
@@ -104,7 +104,7 @@ randomData = []
 dataTransfer = [] # 行列変換用リスト
 dataPosition = 0 # leverPressDataの最後の数字を基づいて，データをほかのリストに挿入する際に順番とする
 
-myList = []
+randList = []
 
 listPosition = 0
 leverPressCounter = 0
@@ -168,26 +168,45 @@ for i in range(1000):
 いろんな関数を事前宣言するところ
 '''
 # 乱数生成関数
-def ransu(): # 大報酬を連続4回以上しないよう
-    # Ruru's magic lists.
-    a = [1,1,0,0]
-    b = [0,0,1,1]
-    c = [1,0,1,0]
-    d = [0,1,0,1]
-    e = [1,0,0,1]
-    f = [0,1,1,0]
-    values = [a,b,c,d,e,f]
-    for i in range(25):
-        x = random.choice(values)
-        for number in range(len(x)):
-            myList.append(x[number])
-            number = number + 1
+def ransu():
+    sum0 = 0
+    # 初期的乱数列を生成
+    for i in range(trialsMax):
+        randList.append(random.randint(0,1))
         i = i + 1
+        pass
+    # 4連以上しないように次の項目を調整
+    for i in range(trialsMax - 3):
+        sum0 = randList[i] + randList[i+1] + randList[i+2]
+        if sum0 == 0: # 0が3連になると次の項目を1に変わる
+            randList[i+3] = 1
+            pass
+        if sum0 == 3: # 1が3連になると次の項目を0に変わる
+            randList[i+3] = 0
+            pass
         pass
     pass
 
+# 0と1が「半々」であるか否かを検証
+def ransuTest():
+    sumRand = 0
+    global randList
+    # 「半々」じゃないとずっと繰り返す
+    while sumRand != trialsMax/2:
+        # リセット
+        randList = []
+        sumRand = 0
+        # 新しい乱数列を再生成
+        ransu()
+        for i in range(trialsMax):
+            sumRand = sumRand + randList[i]
+            pass
+        pass
+    pass
+
+
 # レバー格納関数
-def leverIn():
+def leverRetract():
     GPIO.output(leverLeftMove, GPIO.HIGH)
     GPIO.output(leverRightMove, GPIO.HIGH)
     #GPIO.output(houseLight, GPIO.HIGH)
@@ -265,10 +284,10 @@ def dataSaving():
         writer = csv.writer(myfile)
         writer.writerows(dataTransfer)
     # 生成された乱数列を保存
-    # randomList = list(zip(*myList))
+    # randomList = list(zip(*randList))
     with open(answer2 + '_randomList.csv', 'a+') as myfile2:
         writer = csv.writer(myfile2)
-        writer.writerow(myList)
+        writer.writerow(randList)
     pass
 
 # 「後片付け」関数
@@ -278,24 +297,24 @@ def bye():
     sys.exit() # プログラム停止
     pass
 
-# 乱数生成・大報酬が4連以上存在しないか否かを検証
+# 乱数生成・大報酬が3連以上存在しないか否かを検証
 print("乱数生成中")
 ransu()
 while True:
-    if myList[randPosition] == 1 and myList[randPosition+1] == 1 and randPosition < 99:
+    if randList[randPosition] == 1 and randList[randPosition+1] == 1 and randPosition < 99:
         randCounter = randCounter + 1
-    if myList[randPosition] == 0:
+    if randList[randPosition] == 0:
         randCounter = 0
     randPosition = randPosition + 1
     if randCounter >= 3:
         print("大報酬3連以上あり　やり直し中")
-        myList = []
+        randList = []
         ransu()
         randPosition = 0
         randCounter = 0
     if randPosition >= 99:
         break
-print("生成されました", '\n', myList)
+print("生成されました", '\n', randList)
 
 # 点灯！！
 GPIO.output(houseLight, GPIO.HIGH)
@@ -307,7 +326,7 @@ try:
         timeNow = time.time()
         
         # 最大試行数になったか否か
-        if leverLeftTrial + leverRightTrial >= trialMax:
+        if leverLeftTrial + leverRightTrial >= trialsMax:
             print("最大試行数に達して終了")
             print(timePast, "秒かかった")
             print("左レバー　", leverLeftTrial, "　回")
@@ -367,7 +386,7 @@ try:
 
         # FRを達成したら：
         if leftRight == 'right' and react == x: # 固定報酬選択肢
-            leverIn()
+            leverRetract()
             react = 0
             leftRight = ''
             # 乱数を累進する
@@ -389,12 +408,12 @@ try:
             timeTrial = time.time()
             pass
         elif leftRight == 'left' and react == x: #変動報酬選択肢
-            leverIn()
+            leverRetract()
             react = 0
             leftRight = ''
             # 強化
             reinforceYN = True # 強化する
-            reinforcers = myList[listPosition] # 乱数リストから今回の報酬種類を読み取り
+            reinforcers = randList[listPosition] # 乱数リストから今回の報酬種類を読み取り
             # 乱数を累進する
             listPosition = listPosition + 1
             # 試行を累進する
